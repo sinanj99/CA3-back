@@ -6,10 +6,13 @@
 package entities;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
@@ -29,6 +32,7 @@ public class User implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
     @Basic(optional = false)
@@ -39,12 +43,12 @@ public class User implements Serializable {
     @Basic(optional = false)
     @NotNull
     @Size(min = 1, max = 255)
-    @Column(name = "user_pass")
+    @Column(name = "password")
     private String password;
     @JoinTable(
-        name = "user_roles", 
+        name = "roles_assigned", 
         joinColumns = { @JoinColumn(name = "user_id", referencedColumnName = "id")}, 
-        inverseJoinColumns = {@JoinColumn(name = "role_id", referencedColumnName = "role_id")}
+        inverseJoinColumns = {@JoinColumn(name = "role_id", referencedColumnName = "id")}
     )
     @ManyToMany
     private List<Role> roleList;
@@ -54,10 +58,26 @@ public class User implements Serializable {
     public User(String username, String password){
         this.username = username;
         this.password = BCrypt.hashpw(password, BCrypt.gensalt());
+        roleList = new ArrayList<>();
     }
     
     public boolean verifyPassword(String pw){
         return(BCrypt.checkpw(pw, password));
+    }
+    
+    public List<String> getRolesAsStrings() {
+        if (roleList.isEmpty()) {
+          return null;
+        }
+        List<String> rolesAsStrings = new ArrayList();
+        for (Role role : roleList) {
+          rolesAsStrings.add(role.getRole());
+        }
+        return rolesAsStrings;
+    }
+    
+    public void addRole(Role r){
+        roleList.add(r);
     }
     
     public Long getId() {
@@ -82,33 +102,6 @@ public class User implements Serializable {
 
     public void setPassword(String password) {
         this.password = password;
-    }
-    
-    
-
-    @Override
-    public int hashCode() {
-        int hash = 0;
-        hash += (id != null ? id.hashCode() : 0);
-        return hash;
-    }
-
-    @Override
-    public boolean equals(Object object) {
-        // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof User)) {
-            return false;
-        }
-        User other = (User) object;
-        if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
-            return false;
-        }
-        return true;
-    }
-
-    @Override
-    public String toString() {
-        return "entities.User[ id=" + id + " ]";
     }
     
 }

@@ -46,7 +46,7 @@ public class RenameMeResource {
     @Path("data")
     @GET
     @Produces({MediaType.APPLICATION_JSON})
-    public List<String> getDataFromServers() {
+    public List<String> fetchFromServers() {
         return FACADE.fetchFromServers();
     }
  

@@ -11,7 +11,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 
 /**
- *
+ *a
  * @author Obaydah Mohamad
  */
 public class UserFacade {

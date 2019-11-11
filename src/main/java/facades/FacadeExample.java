@@ -61,44 +61,4 @@ public class FacadeExample {
             em.close();
         }
     }
-    
-    private static String fetchFromServer(String URL, String arg) throws MalformedURLException, ProtocolException, IOException {
-        URL url = new URL(URL + arg);
-        HttpURLConnection con = (HttpURLConnection) url.openConnection();
-        con.setRequestMethod("GET");
-        con.setRequestProperty("Accept", "application/json;charset=UTF-8");
-        String jsonStr = "";
-        try (Scanner scan = new Scanner(con.getInputStream())) {
-            while (scan.hasNext()) {
-                jsonStr+=scan.nextLine();
-            }
-        }
-        return jsonStr;
-    }
-    public List<String> fetchFromServers() {
-        ExecutorService executor = Executors.newFixedThreadPool(5);
-        Queue<Future> futureList = new LinkedList();
-        List<String> allData = new ArrayList();
-        String[] URLS = {"https://jsonplaceholder.typicode.com/comments/","https://jsonplaceholder.typicode.com/posts/",
-        "https://jsonplaceholder.typicode.com/albums/","https://jsonplaceholder.typicode.com/photos/","https://jsonplaceholder.typicode.com/todos/"};
-        for(String URL : URLS) {
-            Future<String> future = executor.submit(()-> {
-                return fetchFromServer(URL,"1");
-            });
-            futureList.add(future);
-        }
-        while(!futureList.isEmpty()) {
-            Future<String> f = futureList.poll();
-            if(f.isDone()) {
-                try {
-                    allData.add(f.get());
-                } catch (InterruptedException | ExecutionException ex) {
-                    System.out.println(ex.getMessage());
-                }
-            } else {
-                futureList.add(f);
-            }
-        }
-        return allData;
-    }
 }

@@ -43,11 +43,4 @@ public class RenameMeResource {
         //System.out.println("--------------->"+count);
         return "{\"count\":"+count+"}";  //Done manually so no need for a DTO
     }
-    @Path("data")
-    @GET
-    @Produces({MediaType.APPLICATION_JSON})
-    public List<String> fetchFromServers() {
-        return FACADE.fetchFromServers();
-    }
- 
 }

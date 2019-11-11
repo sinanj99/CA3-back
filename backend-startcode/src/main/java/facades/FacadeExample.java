@@ -17,6 +17,8 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
@@ -29,8 +31,6 @@ public class FacadeExample {
 
     private static FacadeExample instance;
     private static EntityManagerFactory emf;
-    final static String[] URLS = {"https://jsonplaceholder.typicode.com/comments/","https://jsonplaceholder.typicode.com/posts/",
-        "https://jsonplaceholder.typicode.com/albums/","https://jsonplaceholder.typicode.com/photos/","https://jsonplaceholder.typicode.com/todos/"};
     //Private Constructor to ensure Singleton
     private FacadeExample() {}
     
@@ -62,7 +62,7 @@ public class FacadeExample {
         }
     }
     
-    private static String fetchFromServers(String URL, String arg) throws MalformedURLException, ProtocolException, IOException {
+    private static String fetchFromServer(String URL, String arg) throws MalformedURLException, ProtocolException, IOException {
         URL url = new URL(URL + arg);
         HttpURLConnection con = (HttpURLConnection) url.openConnection();
         con.setRequestMethod("GET");
@@ -75,23 +75,30 @@ public class FacadeExample {
         }
         return jsonStr;
     }
-    public void getDataFromServers() throws InterruptedException, ExecutionException {
+    public List<String> fetchFromServers() {
         ExecutorService executor = Executors.newFixedThreadPool(5);
         Queue<Future> futureList = new LinkedList();
         List<String> allData = new ArrayList();
+        String[] URLS = {"https://jsonplaceholder.typicode.com/comments/","https://jsonplaceholder.typicode.com/posts/",
+        "https://jsonplaceholder.typicode.com/albums/","https://jsonplaceholder.typicode.com/photos/","https://jsonplaceholder.typicode.com/todos/"};
         for(String URL : URLS) {
             Future<String> future = executor.submit(()-> {
-                return fetchFromServers(URL,"1");
+                return fetchFromServer(URL,"1");
             });
             futureList.add(future);
         }
         while(!futureList.isEmpty()) {
             Future<String> f = futureList.poll();
             if(f.isDone()) {
-                allData.add(f.get());
+                try {
+                    allData.add(f.get());
+                } catch (InterruptedException | ExecutionException ex) {
+                    System.out.println(ex.getMessage());
+                }
             } else {
                 futureList.add(f);
             }
         }
+        return allData;
     }
 }

@@ -5,6 +5,8 @@ import com.google.gson.GsonBuilder;
 import entities.RenameMe;
 import utils.EMF_Creator;
 import facades.FacadeExample;
+import java.util.List;
+import java.util.concurrent.ExecutionException;
 import javax.persistence.EntityManagerFactory;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -41,6 +43,11 @@ public class RenameMeResource {
         //System.out.println("--------------->"+count);
         return "{\"count\":"+count+"}";  //Done manually so no need for a DTO
     }
-
+    @Path("data")
+    @GET
+    @Produces({MediaType.APPLICATION_JSON})
+    public List<String> getDataFromServers() {
+        return FACADE.fetchFromServers();
+    }
  
 }

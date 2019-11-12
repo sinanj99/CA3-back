@@ -1,6 +1,5 @@
 package rest;
 
-import com.google.gson.Gson;
 import entities.User;
 import java.util.List;
 import javax.annotation.security.RolesAllowed;
@@ -56,6 +55,7 @@ public class UserResource {
     @RolesAllowed("user")
     public String getFromUser() {
         String thisuser = securityContext.getUserPrincipal().getName();
+        // How do we retrieve roles? 
         return "{\"msg\": \"Hello to User: " + thisuser + "\"}";
     }
 

@@ -5,6 +5,9 @@
  */
 package facades;
 
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import entities.Post;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
@@ -47,8 +50,16 @@ public class ServerFacade {
         return instance;
     }
 
-    private static String fetchFromServer(String URL, String arg) throws MalformedURLException, ProtocolException, IOException {
-        URL url = new URL(URL + arg);
+    /**
+     *
+     * @param resource, what to fetch from the server
+     * @return a json representation of what is returned by the server
+     * @throws MalformedURLException
+     * @throws ProtocolException
+     * @throws IOException
+     */
+    private static String fetchFromServer(String server) throws MalformedURLException, ProtocolException, IOException {
+        URL url = new URL("https://jsonplaceholder.typicode.com/posts/" + server);
         HttpURLConnection con = (HttpURLConnection) url.openConnection();
         con.setRequestMethod("GET");
         con.setRequestProperty("Accept", "application/json;charset=UTF-8");
@@ -61,23 +72,30 @@ public class ServerFacade {
         return jsonStr;
     }
 
-    public List<String> fetchFromServers() {
+    /**
+     * Should call fetchFromServer method on multiple servers
+     * 
+     * @param servers
+     * @return A list containing all json objects returned by servers.
+     */
+    public List<Post> fetchFromServers(String[] servers) {
         ExecutorService executor = Executors.newFixedThreadPool(5);
         Queue<Future> futureList = new LinkedList();
-        List<String> allData = new ArrayList();
-        String[] URLS = {"https://jsonplaceholder.typicode.com/comments/", "https://jsonplaceholder.typicode.com/posts/",
-            "https://jsonplaceholder.typicode.com/albums/", "https://jsonplaceholder.typicode.com/photos/", "https://jsonplaceholder.typicode.com/todos/"};
-        for (String URL : URLS) {
-            Future<String> future = executor.submit(() -> {
-                return fetchFromServer(URL, "1");
+        List<Post> posts = new ArrayList();
+        for (String s : servers) {
+            Future<Post> future = executor.submit(() -> {
+                JsonObject jsonObj = new JsonParser().parse(fetchFromServer(s))
+                        .getAsJsonObject();
+                return new Post(jsonObj.get("id").getAsInt(),
+                        jsonObj.get("title").getAsString(), jsonObj.get("body").getAsString());
             });
             futureList.add(future);
         }
         while (!futureList.isEmpty()) {
-            Future<String> f = futureList.poll();
+            Future<Post> f = futureList.poll();
             if (f.isDone()) {
                 try {
-                    allData.add(f.get());
+                    posts.add(f.get());
                 } catch (InterruptedException | ExecutionException ex) {
                     System.out.println(ex.getMessage());
                 }
@@ -85,6 +103,6 @@ public class ServerFacade {
                 futureList.add(f);
             }
         }
-        return allData;
+        return posts;
     }
 }

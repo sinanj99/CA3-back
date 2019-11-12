@@ -7,6 +7,7 @@ package rest;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import entities.Post;
 import facades.FacadeExample;
 import facades.ServerFacade;
 import java.util.List;
@@ -36,8 +37,9 @@ public class ServerResource {
     @Path("all")
     @GET
     @Produces({MediaType.APPLICATION_JSON})
-    public List<String> getDataFromServers() {
-        return FACADE.fetchFromServers();
+    public List<Post> getDataFromServers() {
+        String[] resources = {"1", "2", "3", "4", "5"};
+        return FACADE.fetchFromServers(resources);
     }
 
 }

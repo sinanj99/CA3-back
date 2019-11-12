@@ -1,17 +1,14 @@
 [![Build Status](https://travis-ci.org/dat3startcode/rest-jpa-devops-startcode.svg?branch=master)](https://travis-ci.org/dat3startcode/rest-jpa-devops-startcode)
 
-*This project is meant as start code for projects and exercises given in Flow-1+2 at http://cphbusiness.dk in the Study Program "AP degree in Computer Science"*
-
-*Projects which are expected to use this start-code are projects that require all, or most of the following technologies:*
- - *JPA and REST*
-- *Testing, including database test*
-- *Testing, including tests of REST-API's*
-- *CI and CONTINUOUS DELIVERY*
-
 ### Preconditions
-*In order to use this code, you should have a local developer setup + a "matching" droplet on Digital Ocean as described in the 3. semester guidelines* 
+*In order to use this code, you should have a local developer setup + a "matching" droplet on Digital Ocean* 
 # Getting Started
+### Fetching data from servers
+The template for fetching data from multiple servers is created in the ServerFacade class. In this example, data is only fetched from a single API, and this should eventually be changed by adding a list of different hosts and looping through this instead.
+### Deploying to droplet
+Remember to change the <remote.server> property in pom.xml to match the IP/domain name of your droplet. Also, don't forget to create environment variables on Travis CI. 
 
-This project contains two major documentation files: 
- - [First time users - getting started](README_proof_of_concept.md)
- - [How to use for future projects](README_how_to_use.md)
+
+
+
+

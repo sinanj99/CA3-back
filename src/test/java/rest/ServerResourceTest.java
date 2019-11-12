@@ -63,17 +63,12 @@ public class ServerResourceTest {
     }
     
     @Test
-    public void testServerIsUp() {
-        System.out.println("Testing is server UP");
-        given().when().get("/xxx").then().statusCode(200);
+    public void testAll() throws Exception {
+        given()
+        .contentType("application/json")
+        .get("/server/all").then()
+        .assertThat()
+        .statusCode(HttpStatus.OK_200.getStatusCode())
+        .body("size()", is(5));   
     }
-//    @Test
-//    public void testAll() throws Exception {
-//        given()
-//        .contentType("application/json")
-//        .get("/server/all").then()
-//        .assertThat()
-//        .statusCode(HttpStatus.OK_200.getStatusCode())
-//        .body("size()", is(5));   
-//    }
 }

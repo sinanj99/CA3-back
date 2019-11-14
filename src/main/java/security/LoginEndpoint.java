@@ -1,6 +1,8 @@
 package security;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.nimbusds.jose.JOSEException;
@@ -33,6 +35,7 @@ public class LoginEndpoint {
   public static final int TOKEN_EXPIRE_TIME = 1000 * 60 * 30; //30 min
   private static final EntityManagerFactory EMF = EMF_Creator.createEntityManagerFactory(EMF_Creator.DbSelector.DEV, EMF_Creator.Strategy.CREATE);
   public static final UserFacade USER_FACADE = UserFacade.getUserFacade(EMF);
+  private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
   
   @POST
   @Consumes(MediaType.APPLICATION_JSON)
@@ -45,9 +48,13 @@ public class LoginEndpoint {
     try {
       User user = USER_FACADE.getUser(username, password);
       String token = createToken(username, user.getRolesAsStrings());
+      JsonElement roles = GSON.toJsonTree(user.getRolesAsStrings());
+      
       JsonObject responseJson = new JsonObject();
       responseJson.addProperty("username", username);
       responseJson.addProperty("token", token);
+      responseJson.add("roles", roles);
+      
       return Response.ok(new Gson().toJson(responseJson)).build();
 
     } catch (JOSEException | AuthenticationException ex) {
